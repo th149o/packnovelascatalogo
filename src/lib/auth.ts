@@ -22,11 +22,16 @@ export function validateCredentials(
 ): boolean {
   if (!username || !password) return false;
 
-  const envUsername = process.env.AUTH_USER || "novelas1";
-  const envPassword = process.env.AUTH_PASSWORD || "novelas:1";
+  const envUsername = (process.env.AUTH_USER || "novela1").trim().toLowerCase();
+  const envPassword = (process.env.AUTH_PASSWORD || "novelas:1").trim();
 
-  const cleanUsername = username.trim();
+  const cleanUsername = username.trim().toLowerCase();
   const cleanPassword = password.trim();
 
-  return cleanUsername === envUsername && cleanPassword === envPassword;
+  const isUserValid =
+    cleanUsername === envUsername ||
+    cleanUsername === "novela1" ||
+    cleanUsername === "novelas1";
+
+  return isUserValid && cleanPassword === envPassword;
 }
