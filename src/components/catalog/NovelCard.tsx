@@ -2,32 +2,27 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Play, Sparkles, CheckCircle2 } from "lucide-react";
 import { CatalogNovel } from "@/data/catalog";
+import { generateSlug } from "@/lib/slug";
 
 interface NovelCardProps {
   novel: CatalogNovel;
   priority?: boolean;
-  onSelectNovel?: (novel: CatalogNovel) => void;
 }
 
-export function NovelCard({ novel, priority = false, onSelectNovel }: NovelCardProps) {
+export function NovelCard({ novel, priority = false }: NovelCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-
-  const handleClick = () => {
-    if (onSelectNovel) {
-      onSelectNovel(novel);
-    }
-  };
+  const slug = generateSlug(novel.title);
 
   return (
     <div className="group relative flex flex-col focus-within:outline-none">
-      {/* Botão/Card Interativo */}
-      <button
-        type="button"
-        onClick={handleClick}
-        aria-label={`Novela: ${novel.title}. Clique para saber mais.`}
-        className="w-full text-left relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#121218] border border-white/[0.08] group-hover:border-[#EE399E]/50 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-[#EE399E]/20 group-hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#EE399E] focus:ring-offset-2 focus:ring-offset-[#09090B] cursor-pointer"
+      {/* Card Link para a Página da Novela */}
+      <Link
+        href={`/novela/${slug}?episodio=1`}
+        aria-label={`Assistir novela: ${novel.title}`}
+        className="w-full text-left relative rounded-xl sm:rounded-2xl overflow-hidden bg-[#121218] border border-white/[0.08] group-hover:border-[#EE399E]/50 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-[#EE399E]/20 group-hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#EE399E] focus:ring-offset-2 focus:ring-offset-[#09090B] cursor-pointer block"
       >
         {/* Contêiner da Capa Vertical (Proporção 9:16) */}
         <div className="relative w-full aspect-[9/16] overflow-hidden bg-zinc-900/60">
@@ -59,7 +54,7 @@ export function NovelCard({ novel, priority = false, onSelectNovel }: NovelCardP
             </span>
           </div>
 
-          {/* Ícone de Play centralizado sutil que aparece no hover */}
+          {/* Ícone de Play centralizado que surge no hover */}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300 z-10 pointer-events-none">
             <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#EE399E] to-[#FE2641] flex items-center justify-center shadow-lg shadow-black/50 transform scale-90 group-hover:scale-100 transition-transform duration-300">
               <Play className="w-5 h-5 text-white fill-white ml-0.5" />
@@ -74,11 +69,10 @@ export function NovelCard({ novel, priority = false, onSelectNovel }: NovelCardP
           </h2>
           <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-zinc-400">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-            <span className="truncate">Acesso Liberado</span>
+            <span className="truncate">Assistir Agora</span>
           </div>
         </div>
-      </button>
+      </Link>
     </div>
   );
 }
-

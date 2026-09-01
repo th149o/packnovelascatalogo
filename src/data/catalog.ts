@@ -23,9 +23,9 @@ export const CATALOG_NOVELS: CatalogNovel[] = [
   },
   {
     id: 3,
-    title: "O Retorno da Herdeira Perdida",
-    filename: "o retorno da herdeira perdida.jpeg",
-    coverUrl: "/capas/o retorno da herdeira perdida.jpeg",
+    title: "Recompensa de Sangue: A Herdeira Retorna (Dublado)",
+    filename: "Recompensa de Sangue - A Herdeira Retorna.jpg",
+    coverUrl: "/capas/Recompensa de Sangue - A Herdeira Retorna.jpg",
     tag: "Novela Completa",
   },
   {
@@ -78,4 +78,3 @@ export const CATALOG_NOVELS: CatalogNovel[] = [
     tag: "Novela Completa",
   },
 ];
-

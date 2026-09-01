@@ -15,8 +15,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Rota "/catalogo" -> bloqueia e exige autenticação
-  if (pathname.startsWith("/catalogo")) {
+  // Rotas protegidas: "/catalogo" e "/novela" -> bloqueiam e exigem autenticação
+  if (pathname.startsWith("/catalogo") || pathname.startsWith("/novela")) {
     if (!isAuthenticated) {
       const loginUrl = new URL("/login", request.url);
       return NextResponse.redirect(loginUrl);
@@ -36,5 +36,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/catalogo/:path*"],
+  matcher: ["/", "/login", "/catalogo/:path*", "/novela/:path*"],
 };

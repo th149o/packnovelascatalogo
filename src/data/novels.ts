@@ -43,17 +43,17 @@ export const novelsList: Novel[] = [
   },
   {
     id: 3,
-    title: "O Retorno da Herdeira Perdida",
-    cover: "/capas/o retorno da herdeira perdida.jpeg",
+    title: "Recompensa de Sangue: A Herdeira Retorna (Dublado)",
+    cover: "/capas/Recompensa de Sangue - A Herdeira Retorna.jpg",
     episodes: 55,
     badge: "💎 Reviravolta Épica",
     synopsis:
-      "Humilhada, traída e expulsa de casa pela família adotiva gananciosa, ela descobre que é a legítima sucessora de uma das maiores dinastias empresariais. Anos depois, seu retorno é marcado por uma sede implacável de justiça.",
+      "Humilhada e traída, ela descobre sua verdadeira identidade e retorna com poder e determinação implacável para fazer justiça e retomar tudo o que lhe pertence por direito.",
     tags: ["Herdeiras", "Vingança", "Histórias de Família", "Reviravoltas"],
     primaryGenre: "Herdeiras & Vingança",
     rating: 5.0,
     durationApprox: "55 episódios (1h 20min)",
-    highlightHook: "Eles a humilharam na miséria. Ela voltou dona de tudo para cobrar a conta.",
+    highlightHook: "Ela voltou dona de tudo para cobrar a conta e fazer justiça.",
   },
   {
     id: 4,

@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, User, AlertCircle, Loader2, Play } from "lucide-react";
 
 export function LoginForm() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,14 +27,14 @@ export function LoginForm() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        router.push("/catalogo");
-        router.refresh();
+        // Redirecionamento imediato e definitivo no primeiro clique
+        window.location.href = "/catalogo";
       } else {
         setErrorMessage(data.error || "Usuário ou senha incorretos.");
+        setIsLoading(false);
       }
     } catch {
       setErrorMessage("Erro de conexão. Tente novamente.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -176,4 +174,3 @@ export function LoginForm() {
     </div>
   );
 }
-
