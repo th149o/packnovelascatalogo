@@ -18,6 +18,7 @@ dist/
 
 # Environment variables & Sensitive Credentials
 .env
+.env.example
 .env*.local
 .env.local
 .env.development.local

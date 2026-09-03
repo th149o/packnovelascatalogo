@@ -1,3 +1,4 @@
+import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import { formatBuyerGreeting } from "./greenn";
 
@@ -6,6 +7,7 @@ export const CATALOG_URL = "https://packnovelascatalogo.vercel.app/";
 export const ACCESS_LOGIN = "novela1";
 export const ACCESS_PASSWORD = "novelas:1";
 export const EMAIL_SUBJECT = "Sua compra foi confirmada — Seu acesso às novelas";
+export const DEFAULT_GMAIL_ADDRESS = "paginacerta.contato@gmail.com";
 
 /**
  * Gera o corpo do e-mail em texto puro (fallback para leitores que desabilitam HTML)
@@ -240,30 +242,70 @@ export function generateHtmlEmail(buyerName?: string | null): string {
 }
 
 /**
- * Envia o e-mail de acesso ao comprador através do Resend
+ * Envia o e-mail via Gmail SMTP (100% Gratuito) usando Nodemailer
  */
-export async function sendAccessEmail({
+async function sendViaGmail({
   to,
   buyerName,
+  user,
+  pass,
 }: {
   to: string;
   buyerName?: string | null;
+  user: string;
+  pass: string;
 }): Promise<{ success: boolean; id?: string; error?: string }> {
-  const apiKey = process.env.RESEND_API_KEY;
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user,
+        pass: pass.replace(/\s+/g, ""), // Remove espaços caso o usuário copie com espaços do Google
+      },
+    });
 
-  if (!apiKey || apiKey.trim() === "") {
+    const fromAddress = process.env.EMAIL_FROM || `Pack Novelas <${user}>`;
+    const htmlContent = generateHtmlEmail(buyerName);
+    const textContent = generatePlainTextEmail(buyerName);
+
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      to,
+      subject: EMAIL_SUBJECT,
+      text: textContent,
+      html: htmlContent,
+    });
+
+    return {
+      success: true,
+      id: info.messageId,
+    };
+  } catch (err: any) {
     return {
       success: false,
-      error: "RESEND_API_KEY não configurada no ambiente.",
+      error: err?.message || "Erro desconhecido ao enviar pelo Gmail SMTP",
     };
   }
+}
 
-  const resend = new Resend(apiKey);
-  const from = process.env.EMAIL_FROM || "Pack Novelas <onboarding@resend.dev>";
-  const htmlContent = generateHtmlEmail(buyerName);
-  const textContent = generatePlainTextEmail(buyerName);
-
+/**
+ * Envia o e-mail via Resend (caso configurado)
+ */
+async function sendViaResend({
+  to,
+  buyerName,
+  apiKey,
+}: {
+  to: string;
+  buyerName?: string | null;
+  apiKey: string;
+}): Promise<{ success: boolean; id?: string; error?: string }> {
   try {
+    const resend = new Resend(apiKey);
+    const from = process.env.EMAIL_FROM || "Pack Novelas <onboarding@resend.dev>";
+    const htmlContent = generateHtmlEmail(buyerName);
+    const textContent = generatePlainTextEmail(buyerName);
+
     const { data, error } = await resend.emails.send({
       from,
       to: [to],
@@ -275,7 +317,7 @@ export async function sendAccessEmail({
     if (error) {
       return {
         success: false,
-        error: error.message || "Erro desconhecido ao enviar pelo Resend",
+        error: error.message || "Erro desconhecido no Resend",
       };
     }
 
@@ -286,8 +328,52 @@ export async function sendAccessEmail({
   } catch (err: any) {
     return {
       success: false,
-      error: err?.message || "Exceção inesperada no envio de e-mail",
+      error: err?.message || "Exceção inesperada no envio via Resend",
     };
   }
 }
 
+/**
+ * Função principal de envio de e-mail de acesso.
+ * Prioriza Gmail SMTP (gratuito) se GMAIL_APP_PASSWORD estiver configurado.
+ * Fallback para Resend se RESEND_API_KEY estiver configurado.
+ */
+export async function sendAccessEmail({
+  to,
+  buyerName,
+}: {
+  to: string;
+  buyerName?: string | null;
+}): Promise<{ success: boolean; id?: string; provider?: string; error?: string }> {
+  const gmailUser = process.env.GMAIL_USER || DEFAULT_GMAIL_ADDRESS;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  const resendApiKey = process.env.RESEND_API_KEY;
+
+  // 1. Se tiver senha de app do Gmail configurada, envia pelo Gmail
+  if (gmailPass && gmailPass.trim() !== "") {
+    const result = await sendViaGmail({
+      to,
+      buyerName,
+      user: gmailUser,
+      pass: gmailPass,
+    });
+    return { ...result, provider: "Gmail SMTP" };
+  }
+
+  // 2. Se tiver chave do Resend configurada, envia pelo Resend
+  if (resendApiKey && resendApiKey.trim() !== "") {
+    const result = await sendViaResend({
+      to,
+      buyerName,
+      apiKey: resendApiKey,
+    });
+    return { ...result, provider: "Resend" };
+  }
+
+  // 3. Nenhuma credencial de envio configurada
+  return {
+    success: false,
+    error:
+      "Nenhum serviço de envio configurado. Configure GMAIL_APP_PASSWORD (para Gmail gratuito) ou RESEND_API_KEY.",
+  };
+}

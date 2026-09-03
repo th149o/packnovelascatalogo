@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Falha ao enviar e-mail de acesso. Verifique as configurações do Resend.",
+          error: `Falha ao enviar e-mail de acesso: ${emailResult.error}`,
         },
         { status: 500 }
       );
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(
-      `[GREENN EMAIL] E-mail enviado com sucesso para ${maskEmail(parsed.buyerEmail)} (Resend ID: ${emailResult.id || "N/A"}).`
+      `[GREENN EMAIL] E-mail enviado com sucesso para ${maskEmail(parsed.buyerEmail)} via ${emailResult.provider || "Email"} (ID: ${emailResult.id || "N/A"}).`
     );
 
     return NextResponse.json(
